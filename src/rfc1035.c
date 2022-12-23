@@ -1094,18 +1094,20 @@ int add_resource_record(struct dns_header *header, char *limit, int *truncp, int
     {
       char *name = va_arg(ap, char *);
       if (name) 
-      	p = do_rfc1035_name(p, name);
-      
+      	p = do_rfc1035_name(p, name, limit);
+      if(!p)
+      {
+	      va_end(ap);
+	      goto truncated;
+      }
+	  
       if (nameoffset < 0)
 	{
 	  /*CHECK_LIMIT(2);*/
 	  PUTSHORT(-nameoffset | 0xc000, p);
 	}
       else
-	{
-	  /*CHECK_LIMIT(1);*/
-	  *p++ = 0;
-	}
+	      *p++ = 0;
     }
 
   /* type (2) + class (2) + ttl (4) + rdlen (2) */
